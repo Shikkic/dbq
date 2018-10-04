@@ -1,7 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
+
+	"github.com/shikkic/dbq/equality"
 
 	"gopkg.in/urfave/cli.v1"
 
@@ -16,25 +19,29 @@ func main() {
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:  "source-database",
-			Usage: "The source db for checkin equality",
+			Name:  "source-database-url",
+			Usage: "The source db url for checkin equality",
 		},
 		cli.StringFlag{
-			Name:  "target-database",
-			Usage: "The target db for checkin equality",
+			Name:  "target-database-url",
+			Usage: "The target db url for checkin equality",
 		},
 	}
 
 	app.Action = func(c *cli.Context) error {
-		if c.String("source-database") == "" {
-			return errors.New("Required flag missing \"source-database\"")
+		sourceDBUrl := c.String("source-database-url")
+		if sourceDBUrl == "" {
+			return errors.New("Required flag missing \"source-database-url\"")
 		}
 
-		if c.String("target-database") == "" {
-			return errors.New("Required flag missing \"target-database\"")
+		targetDBUrl := c.String("target-database-url")
+		if targetDBUrl == "" {
+			return errors.New("Required flag missing \"target-database-url\"")
 		}
 
-		return nil
+		fmt.Println(sourceDBUrl, targetDBUrl)
+
+		return equality.CheckDBSubsetEquality(sourceDBUrl, targetDBUrl)
 	}
 
 	err := app.Run(os.Args)
